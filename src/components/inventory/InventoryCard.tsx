@@ -12,12 +12,6 @@ type Props = {
   onAddToShoppingList: (id: string, name: string) => void;
 };
 
-function isExpiringSoon(date: Date | null): boolean {
-  if (!date) return false;
-  const diff = new Date(date).getTime() - Date.now();
-  return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
-}
-
 export function InventoryCard({
   item,
   onUpdateQuantity,
@@ -25,8 +19,6 @@ export function InventoryCard({
   onAddToShoppingList,
 }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const expiring = isExpiringSoon(item.expiryDate);
 
   return (
     <>
@@ -36,23 +28,10 @@ export function InventoryCard({
         onSwipeRight={() => setShowConfirm(true)}
         onSwipeLeft={() => onAddToShoppingList(item.id, item.name)}
       >
-        <div
-          className={`px-4 py-3 flex items-center justify-between gap-2 ${
-            expiring ? "bg-danger-50" : "bg-white"
-          }`}
-        >
+        <div className="px-4 py-3 flex items-center justify-between gap-2 bg-white">
           <div className="flex-1 min-w-0">
             <p className="font-medium truncate">{item.name}</p>
             <p className="text-xs text-gray-500">{item.category.name}</p>
-            {item.expiryDate && (
-              <p
-                className={`text-xs ${
-                  expiring ? "text-danger-600 font-medium" : "text-gray-400"
-                }`}
-              >
-                期限: {new Date(item.expiryDate).toLocaleDateString("ja-JP")}
-              </p>
-            )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button

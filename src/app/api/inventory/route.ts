@@ -33,21 +33,45 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, quantity, categoryId, purchaseDate, expiryDate, isStaple } =
-    parsed.data;
+  const { name, quantity, categoryName, isStaple } = parsed.data;
+  const userId = session.user.id;
 
-  const item = await db.inventoryItem.create({
-    data: {
-      name,
-      quantity,
-      categoryId,
-      purchaseDate: new Date(purchaseDate),
-      expiryDate: expiryDate ? new Date(expiryDate) : null,
-      isStaple: isStaple ?? false,
-      userId: session.user.id,
-    },
-    include: { category: true },
-  });
+  const userExists = await db.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!userExists) {
+    return NextResponse.json({ error: "User not found" }, { status: 401 });
+  }
 
-  return NextResponse.json(item, { status: 201 });
+  try {
+    const existingCategory = await db.category.findFirst({
+      where: {
+        name: categoryName,
+        OR: [{ isPreset: true }, { userId }],
+      },
+    });
+
+    const category =
+      existingCategory ??
+      (await db.category.create({
+        data: { name: categoryName, userId, isPreset: false },
+      }));
+
+    const item = await db.inventoryItem.create({
+      data: {
+        name,
+        quantity,
+        categoryId: category.id,
+        isStaple: isStaple ?? false,
+        userId,
+      },
+      include: { category: true },
+    });
+
+    return NextResponse.json(item, { status: 201 });
+  } catch (e) {
+    console.error("[POST /api/inventory]", e);
+    return NextResponse.json(
+      { error: "Internal server error", details: String(e) },
+      { status: 500 }
+    );
+  }
 }

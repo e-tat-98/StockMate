@@ -22,13 +22,16 @@ function useDebounce<T>(value: T, delay: number): T {
 
 export function InventoryForm({ onSubmit, isLoading }: Props) {
   const { data: categories = [] } = useCategories();
-  const [nameInput, setNameInput] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const debouncedName = useDebounce(nameInput, 300);
-  const suggestionsRef = useRef<HTMLUListElement>(null);
 
-  const today = new Date().toISOString().split("T")[0];
+  // 品目サジェスト
+  const [nameInput, setNameInput] = useState("");
+  const [nameSuggestions, setNameSuggestions] = useState<string[]>([]);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const debouncedName = useDebounce(nameInput, 300);
+
+  // カテゴリサジェスト
+  const [categoryInput, setCategoryInput] = useState("");
+  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
 
   const {
     register,
@@ -38,7 +41,6 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
   } = useForm<CreateInventoryInput>({
     resolver: zodResolver(createInventorySchema),
     defaultValues: {
-      purchaseDate: today,
       isStaple: false as boolean,
       quantity: 1,
     },
@@ -46,19 +48,31 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
 
   useEffect(() => {
     if (!debouncedName) {
-      setSuggestions([]);
+      setNameSuggestions([]);
       return;
     }
     fetch(`/api/inventory/suggestions?q=${encodeURIComponent(debouncedName)}`)
       .then((r) => r.json())
-      .then(setSuggestions)
-      .catch(() => setSuggestions([]));
+      .then(setNameSuggestions)
+      .catch(() => setNameSuggestions([]));
   }, [debouncedName]);
 
-  function selectSuggestion(name: string) {
+  const filteredCategories = categoryInput
+    ? categories.filter((c) =>
+        c.name.toLowerCase().includes(categoryInput.toLowerCase())
+      )
+    : categories;
+
+  function selectNameSuggestion(name: string) {
     setNameInput(name);
     setValue("name", name, { shouldValidate: true });
-    setShowSuggestions(false);
+    setShowNameSuggestions(false);
+  }
+
+  function selectCategory(name: string) {
+    setCategoryInput(name);
+    setValue("categoryName", name, { shouldValidate: true });
+    setShowCategorySuggestions(false);
   }
 
   async function onFormSubmit(data: CreateInventoryInput) {
@@ -78,23 +92,20 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
           onChange={(e) => {
             setNameInput(e.target.value);
             setValue("name", e.target.value, { shouldValidate: true });
-            setShowSuggestions(true);
+            setShowNameSuggestions(true);
           }}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowNameSuggestions(false), 150)}
+          onFocus={() => nameSuggestions.length > 0 && setShowNameSuggestions(true)}
           className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           placeholder="例: 醤油"
         />
         <input type="hidden" {...register("name")} />
-        {showSuggestions && suggestions.length > 0 && (
-          <ul
-            ref={suggestionsRef}
-            className="absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg"
-          >
-            {suggestions.map((s) => (
+        {showNameSuggestions && nameSuggestions.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg">
+            {nameSuggestions.map((s) => (
               <li
                 key={s}
-                onMouseDown={() => selectSuggestion(s)}
+                onMouseDown={() => selectNameSuggestion(s)}
                 className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
               >
                 {s}
@@ -126,48 +137,42 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
       </div>
 
       {/* カテゴリ */}
-      <div>
+      <div className="relative">
         <label className="block text-sm font-medium mb-1">
           カテゴリ <span className="text-danger-600">*</span>
         </label>
-        <select
-          {...register("categoryId")}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white"
-        >
-          <option value="">選択してください</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-        {errors.categoryId && (
+        <input
+          type="text"
+          value={categoryInput}
+          onChange={(e) => {
+            setCategoryInput(e.target.value);
+            setValue("categoryName", e.target.value, { shouldValidate: true });
+            setShowCategorySuggestions(true);
+          }}
+          onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 150)}
+          onFocus={() => setShowCategorySuggestions(true)}
+          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          placeholder="例: 調味料"
+        />
+        <input type="hidden" {...register("categoryName")} />
+        {showCategorySuggestions && filteredCategories.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
+            {filteredCategories.map((c) => (
+              <li
+                key={c.id}
+                onMouseDown={() => selectCategory(c.name)}
+                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+              >
+                {c.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        {errors.categoryName && (
           <p className="text-xs text-danger-600 mt-1">
-            {errors.categoryId.message}
+            {errors.categoryName.message}
           </p>
         )}
-      </div>
-
-      {/* 購入日 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">購入日</label>
-        <input
-          type="date"
-          {...register("purchaseDate")}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-        />
-      </div>
-
-      {/* 期限 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          賞味・消費期限（任意）
-        </label>
-        <input
-          type="date"
-          {...register("expiryDate")}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-        />
       </div>
 
       {/* 常備品 */}

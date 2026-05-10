@@ -27,17 +27,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const { purchaseDate, expiryDate, quantity, ...rest } = parsed.data;
+  const { quantity, ...rest } = parsed.data;
 
   const updated = await db.$transaction(async (tx) => {
     const item = await tx.inventoryItem.update({
       where: { id },
       data: {
         ...rest,
-        ...(purchaseDate ? { purchaseDate: new Date(purchaseDate) } : {}),
-        ...(expiryDate !== undefined
-          ? { expiryDate: expiryDate ? new Date(expiryDate) : null }
-          : {}),
         ...(quantity !== undefined ? { quantity } : {}),
       },
       include: { category: true },
