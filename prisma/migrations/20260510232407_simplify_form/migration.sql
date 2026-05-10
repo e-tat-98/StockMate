@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "InventoryItem" ALTER COLUMN "purchaseDate" SET DEFAULT CURRENT_TIMESTAMP;

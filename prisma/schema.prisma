@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Auth.js tables (managed by @auth/prisma-adapter)
@@ -78,7 +77,7 @@ model InventoryItem {
   name         String
   quantity     Int
   categoryId   String
-  purchaseDate DateTime
+  purchaseDate DateTime  @default(now())
   expiryDate   DateTime?
   isStaple     Boolean   @default(false)
   userId       String
