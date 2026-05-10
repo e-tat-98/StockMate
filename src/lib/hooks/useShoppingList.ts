@@ -23,11 +23,7 @@ async function addShoppingListItem(
 }
 
 async function toggleShoppingListItem(id: string): Promise<ShoppingListItem> {
-  const res = await fetch(`/api/shopping-list/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ isPurchased: true }),
-  });
+  const res = await fetch(`/api/shopping-list/${id}`, { method: "PATCH" });
   if (!res.ok) throw new Error("Failed to toggle item");
   return res.json();
 }
@@ -56,6 +52,7 @@ export function useShoppingList() {
     mutationFn: toggleShoppingListItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });
 
