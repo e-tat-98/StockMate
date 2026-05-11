@@ -5,10 +5,12 @@ import { createContext, useCallback, useContext, useRef, useState } from "react"
 type Toast = {
   id: number;
   message: string;
+  variant?: "error" | "info";
 };
 
 type ToastContextValue = {
   showError: (message: string) => void;
+  showInfo: (message: string) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -23,18 +25,24 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showError = useCallback((message: string) => {
     const id = ++counterRef.current;
-    setToasts((prev) => [...prev, { id, message }]);
+    setToasts((prev) => [...prev, { id, message, variant: "error" }]);
     setTimeout(() => dismiss(id), 5000);
   }, [dismiss]);
 
+  const showInfo = useCallback((message: string) => {
+    const id = ++counterRef.current;
+    setToasts((prev) => [...prev, { id, message, variant: "info" }]);
+    setTimeout(() => dismiss(id), 4000);
+  }, [dismiss]);
+
   return (
-    <ToastContext.Provider value={{ showError }}>
+    <ToastContext.Provider value={{ showError, showInfo }}>
       {children}
       <div className="fixed bottom-20 left-0 right-0 flex flex-col items-center gap-2 px-4 z-50 pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="flex items-center gap-3 bg-gray-900 text-white text-sm px-4 py-3 rounded-xl shadow-lg max-w-sm w-full pointer-events-auto"
+            className={`flex items-center gap-3 text-white text-sm px-4 py-3 rounded-xl shadow-lg max-w-sm w-full pointer-events-auto ${toast.variant === "info" ? "bg-green-700" : "bg-gray-900"}`}
           >
             <span className="flex-1">{toast.message}</span>
             <button

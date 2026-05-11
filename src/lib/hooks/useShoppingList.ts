@@ -36,7 +36,7 @@ async function deleteShoppingListItem(id: string): Promise<void> {
 
 export function useShoppingList() {
   const queryClient = useQueryClient();
-  const { showError } = useToast();
+  const { showError, showInfo } = useToast();
 
   const query = useQuery({
     queryKey: ["shopping-list"],
@@ -53,9 +53,12 @@ export function useShoppingList() {
 
   const toggleItem = useMutation({
     mutationFn: toggleShoppingListItem,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      if (data.inventoryItemId && data.isPurchased) {
+        showInfo(`${data.name}の在庫数を自動で+1しました`);
+      }
     },
     onError: () => showError("チェックの更新に失敗しました"),
   });
