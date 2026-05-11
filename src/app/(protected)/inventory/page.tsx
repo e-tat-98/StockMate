@@ -8,14 +8,21 @@ import { useCategories } from "@/lib/hooks/useCategories";
 export default function InventoryPage() {
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const { data: categories } = useCategories();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   return (
     <div>
       <header className="px-4 pt-4 pb-3 border-b space-y-3 sticky top-0 bg-white dark:bg-gray-900 dark:border-gray-700 z-10">
         <h1 className="text-lg font-semibold">在庫一覧</h1>
         <SearchInput value={search} onChange={setSearch} placeholder="品目で検索..." />
-        {categories && categories.length > 0 && (
+        {categoriesLoading && (
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none animate-pulse">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 h-7 rounded-full bg-gray-200 dark:bg-gray-700" style={{ width: `${[48, 64, 56, 72][i]}px` }} />
+            ))}
+          </div>
+        )}
+        {!categoriesLoading && categories && categories.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             <button
               onClick={() => setCategoryId(null)}
