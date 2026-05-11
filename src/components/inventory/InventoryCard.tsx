@@ -28,16 +28,16 @@ export function InventoryCard({
         onSwipeRight={() => setShowConfirm(true)}
         onSwipeLeft={() => onAddToShoppingList(item.id, item.name)}
       >
-        <div className="px-4 py-3 flex items-center justify-between gap-2 bg-white">
+        <div className="px-4 py-3 flex items-center justify-between gap-2 bg-white dark:bg-gray-900">
           <div className="flex-1 min-w-0">
             <p className="font-medium truncate">{item.name}</p>
-            <p className="text-xs text-gray-500">{item.category.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{item.category.name}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
               disabled={item.quantity <= 0}
-              className="w-8 h-8 rounded-full border flex items-center justify-center text-lg font-bold disabled:opacity-30"
+              className="w-8 h-8 rounded-full border dark:border-gray-600 flex items-center justify-center text-lg font-bold disabled:opacity-30"
               aria-label="数量を減らす"
             >
               −
@@ -47,7 +47,7 @@ export function InventoryCard({
             </span>
             <button
               onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-              className="w-8 h-8 rounded-full border flex items-center justify-center text-lg font-bold"
+              className="w-8 h-8 rounded-full border dark:border-gray-600 flex items-center justify-center text-lg font-bold"
               aria-label="数量を増やす"
             >
               ＋
