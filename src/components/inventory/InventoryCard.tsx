@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SwipeableItem } from "@/components/ui/SwipeableItem";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { InventoryItem } from "@/types";
 
@@ -18,22 +17,41 @@ export function InventoryCard({
   onDelete,
   onAddToShoppingList,
 }: Props) {
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddConfirm, setShowAddConfirm] = useState(false);
 
   return (
     <>
-      <SwipeableItem
-        rightLabel="削除"
-        leftLabel="買い物リスト"
-        onSwipeRight={() => setShowConfirm(true)}
-        onSwipeLeft={() => onAddToShoppingList(item.id, item.name)}
-      >
-        <div className="px-4 py-3 flex items-center justify-between gap-2 bg-white">
-          <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">{item.name}</p>
-            <p className="text-xs text-gray-500">{item.category.name}</p>
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
+      <div className="px-4 py-3 flex items-center justify-between gap-2 bg-white">
+        <div className="flex-1 min-w-0">
+          <p className="font-medium truncate">{item.name}</p>
+          <p className="text-xs text-gray-500">{item.category.name}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setShowAddConfirm(true)}
+            className="w-11 h-11 flex items-center justify-center text-green-600 hover:bg-green-50 rounded-full"
+            aria-label="買い物リストへ追加"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+          </button>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-11 h-11 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-full"
+            aria-label="削除"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+          <div className="flex items-center gap-1">
             <button
               onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
               disabled={item.quantity <= 0}
@@ -54,18 +72,29 @@ export function InventoryCard({
             </button>
           </div>
         </div>
-      </SwipeableItem>
+      </div>
 
       <ConfirmDialog
-        open={showConfirm}
+        open={showDeleteConfirm}
         title={`「${item.name}」を削除しますか？`}
         description="この操作は元に戻せません"
         confirmLabel="削除"
         onConfirm={() => {
           onDelete(item.id);
-          setShowConfirm(false);
+          setShowDeleteConfirm(false);
         }}
-        onCancel={() => setShowConfirm(false)}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      <ConfirmDialog
+        open={showAddConfirm}
+        title={`「${item.name}」を買い物リストへ追加しますか？`}
+        confirmLabel="追加"
+        onConfirm={() => {
+          onAddToShoppingList(item.id, item.name);
+          setShowAddConfirm(false);
+        }}
+        onCancel={() => setShowAddConfirm(false)}
       />
     </>
   );
