@@ -9,18 +9,20 @@ import type { InventoryItem } from "@/types";
 
 type Props = {
   search: string;
+  categoryId?: string | null;
 };
 
-export function InventoryList({ search }: Props) {
+export function InventoryList({ search, categoryId }: Props) {
   const { query, updateItem, deleteItem } = useInventory();
   const { addItem } = useShoppingList();
 
   const filtered = useMemo(() => {
-    const items: InventoryItem[] = query.data ?? [];
+    let items: InventoryItem[] = query.data ?? [];
+    if (categoryId) items = items.filter((i) => i.categoryId === categoryId);
     if (!search) return items;
     const lower = search.toLowerCase();
     return items.filter((i) => i.name.toLowerCase().includes(lower));
-  }, [query.data, search]);
+  }, [query.data, search, categoryId]);
 
   if (query.isLoading) {
     return (
