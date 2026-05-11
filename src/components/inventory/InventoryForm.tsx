@@ -96,17 +96,17 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
           }}
           onBlur={() => setTimeout(() => setShowNameSuggestions(false), 150)}
           onFocus={() => nameSuggestions.length > 0 && setShowNameSuggestions(true)}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-400"
           placeholder="例: 醤油"
         />
         <input type="hidden" {...register("name")} />
         {showNameSuggestions && nameSuggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg">
+          <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg mt-1 shadow-lg">
             {nameSuggestions.map((s) => (
               <li
                 key={s}
                 onMouseDown={() => selectNameSuggestion(s)}
-                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 {s}
               </li>
@@ -127,7 +127,7 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
           type="number"
           min={1}
           {...register("quantity", { valueAsNumber: true })}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-400"
         />
         {errors.quantity && (
           <p className="text-xs text-danger-600 mt-1">
@@ -151,17 +151,17 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
           }}
           onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 150)}
           onFocus={() => setShowCategorySuggestions(true)}
-          className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-400"
           placeholder="例: 調味料"
         />
         <input type="hidden" {...register("categoryName")} />
         {showCategorySuggestions && filteredCategories.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
+          <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
             {filteredCategories.map((c) => (
               <li
                 key={c.id}
                 onMouseDown={() => selectCategory(c.name)}
-                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 {c.name}
               </li>
@@ -191,7 +191,7 @@ export function InventoryForm({ onSubmit, isLoading }: Props) {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-black text-white rounded-lg px-4 py-3 text-sm font-medium disabled:opacity-50"
+        className="w-full bg-black dark:bg-white text-white dark:text-gray-900 rounded-lg px-4 py-3 text-sm font-medium disabled:opacity-50"
       >
         {isLoading ? "登録中..." : "登録する"}
       </button>

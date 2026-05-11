@@ -16,7 +16,7 @@ export default function NewInventoryPage() {
 
   return (
     <div>
-      <header className="px-4 py-4 border-b">
+      <header className="px-4 py-4 border-b dark:border-gray-700">
         <h1 className="text-lg font-semibold">在庫登録</h1>
       </header>
       <InventoryForm

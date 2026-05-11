@@ -24,7 +24,7 @@ export function InventoryList({ search }: Props) {
 
   if (query.isLoading) {
     return (
-      <ul className="divide-y">
+      <ul className="divide-y dark:divide-gray-700">
         {[...Array(5)].map((_, i) => (
           <li key={i}>
             <InventoryCardSkeleton />
@@ -36,14 +36,14 @@ export function InventoryList({ search }: Props) {
 
   if (filtered.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-gray-500 dark:text-gray-400 py-16">
         {search ? "該当する在庫がありません" : "在庫がありません"}
       </p>
     );
   }
 
   return (
-    <ul className="divide-y">
+    <ul className="divide-y dark:divide-gray-700">
       {filtered.map((item) => (
         <li key={item.id}>
           <InventoryCard

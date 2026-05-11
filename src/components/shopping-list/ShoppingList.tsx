@@ -23,7 +23,7 @@ export function ShoppingList() {
     return (
       <div className="px-4 py-6 space-y-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
+          <div key={i} className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
         ))}
       </div>
     );
@@ -31,27 +31,27 @@ export function ShoppingList() {
 
   return (
     <div>
-      <form onSubmit={handleAdd} className="flex gap-2 px-4 py-3 border-b">
+      <form onSubmit={handleAdd} className="flex gap-2 px-4 py-3 border-b dark:border-gray-700">
         <input
           type="text"
           value={newItemName}
           onChange={(e) => setNewItemName(e.target.value)}
           placeholder="アイテムを追加..."
-          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-400"
         />
         <button
           type="submit"
           disabled={!newItemName.trim() || addItem.isPending}
-          className="bg-black text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50"
+          className="bg-black dark:bg-white text-white dark:text-gray-900 rounded-lg px-4 py-2 text-sm disabled:opacity-50"
         >
           追加
         </button>
       </form>
 
       {items.length === 0 ? (
-        <p className="text-center text-gray-500 py-16">買い物リストは空です</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 py-16">買い物リストは空です</p>
       ) : (
-        <ul className="divide-y">
+        <ul className="divide-y dark:divide-gray-700">
           {unchecked.map((item) => (
             <li key={item.id}>
               <ShoppingListItem
@@ -62,7 +62,7 @@ export function ShoppingList() {
             </li>
           ))}
           {checked.length > 0 && unchecked.length > 0 && (
-            <li className="px-4 py-2 text-xs text-gray-400 bg-gray-50">
+            <li className="px-4 py-2 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800">
               購入済み
             </li>
           )}
