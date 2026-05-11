@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ShoppingListItem } from "@/types";
 import type { CreateShoppingListItemInput } from "@/lib/validations/shopping-list";
+import { useToast } from "@/components/ui/Toast";
 
 async function fetchShoppingList(): Promise<ShoppingListItem[]> {
   const res = await fetch("/api/shopping-list");
@@ -35,6 +36,7 @@ async function deleteShoppingListItem(id: string): Promise<void> {
 
 export function useShoppingList() {
   const queryClient = useQueryClient();
+  const { showError } = useToast();
 
   const query = useQuery({
     queryKey: ["shopping-list"],
@@ -46,6 +48,7 @@ export function useShoppingList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
     },
+    onError: () => showError("買い物リストへの追加に失敗しました"),
   });
 
   const toggleItem = useMutation({
@@ -54,6 +57,7 @@ export function useShoppingList() {
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
+    onError: () => showError("チェックの更新に失敗しました"),
   });
 
   const deleteItem = useMutation({
@@ -61,6 +65,7 @@ export function useShoppingList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
     },
+    onError: () => showError("買い物リストからの削除に失敗しました"),
   });
 
   return { query, addItem, toggleItem, deleteItem };

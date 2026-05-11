@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InventoryItem } from "@/types";
 import type { CreateInventoryInput, UpdateInventoryInput } from "@/lib/validations/inventory";
+import { useToast } from "@/components/ui/Toast";
 
 async function fetchInventory(): Promise<InventoryItem[]> {
   const res = await fetch("/api/inventory");
@@ -42,6 +43,7 @@ async function deleteInventoryItem(id: string): Promise<void> {
 
 export function useInventory() {
   const queryClient = useQueryClient();
+  const { showError } = useToast();
 
   const query = useQuery({
     queryKey: ["inventory"],
@@ -53,6 +55,7 @@ export function useInventory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
+    onError: () => showError("在庫の登録に失敗しました"),
   });
 
   const updateItem = useMutation({
@@ -62,6 +65,7 @@ export function useInventory() {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
       queryClient.invalidateQueries({ queryKey: ["shopping-list"] });
     },
+    onError: () => showError("在庫の更新に失敗しました"),
   });
 
   const deleteItem = useMutation({
@@ -69,6 +73,7 @@ export function useInventory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
+    onError: () => showError("在庫の削除に失敗しました"),
   });
 
   return { query, createItem, updateItem, deleteItem };
